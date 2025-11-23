@@ -74,16 +74,15 @@ Countries — https://685013d7e7c42cfd17974a33.mockapi.io/countries
 
 📁 Project Structure
 
-src/
-├── components/
-│   ├── DataTable.jsx
-│   ├── DataTable.css
-│   ├── EditModal.jsx
-│   ├── EditModal.css
-├── App.jsx
-├── App.css
-└── index.css
-
+📦 src/
+├── 📂 components/
+│   ├── 📄 DataTable.jsx
+│   ├── 🎨 DataTable.css
+│   ├── 📄 EditModal.jsx
+│   └── 🎨 EditModal.css
+├── 📄 App.jsx
+├── 🎨 App.css
+└── 🎨 index.css
 
 ---
 
@@ -194,3 +193,4 @@ This project is created solely for the Inkle Assignment.
 
 ⭐ If this project helped you, leave a star!
 Made with ❤️
+
