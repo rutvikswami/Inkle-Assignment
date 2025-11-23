@@ -1,29 +1,40 @@
 🌟 Inkle Assignment – Data Table Application
 
-A modern, responsive React-based data table application featuring advanced filtering, editing workflows, and dynamic country management — all wrapped in a clean, intuitive UI.
+A modern, responsive React-based data table application featuring advanced filtering, editing workflows, and dynamic country management — all wrapped in a clean, intuitive user interface.
 
 
 ---
 
-✨ Features Overview
+✨ Features
 
-📊 Interactive Data Table — Sort, search, and filter seamlessly using TanStack Table
-🌍 Multi-Select Country Filter — Filter customers by multiple countries at once
-✏️ Smart Edit Modal — Smooth UI with dropdowns, validations, and edit options
-🔧 Dynamic Country Editing — Modify country names with backend sync via MockAPI
-📱 Fully Responsive — Optimized layouts for all screen sizes
-🎨 Modern UI/UX — Clean contemporary design patterns
-✅ Form Validation — Proper input handling, error messages, clean UX flow
+📊 Interactive Data Table powered by TanStack Table
+
+🌍 Multi-Select Country Filter for advanced filtering
+
+✏️ Edit Modal with clean UI and validation
+
+🔧 Dynamic Country Editing connected to MockAPI
+
+📱 Fully Responsive layout
+
+🎨 Modern UI/UX styling
+
+✅ Form Validation & Error Handling
+
 
 
 ---
 
-🛠️ Tech Stack
+🛠️ Technologies Used
 
 React 18
+
 TanStack Table v8
+
 CSS3
-MockAPI Backend
+
+MockAPI (for CRUD)
+
 
 
 ---
@@ -32,33 +43,31 @@ MockAPI Backend
 
 Prerequisites
 
-Node.js v14+
+Node.js 14+
+
 npm or yarn
+
 
 
 ---
 
-📥 Installation
+Installation
 
-1. Clone repository
+# 1. Clone the repository
 git clone <repository-url>
 cd my-app
 
-
-2. Install dependencies
+# 2. Install dependencies
 npm install
 
-
-3. Setup environment (optional)
+# 3. Optional: Environment variables
 cp .env.example .env.local
 
-
-4. Start development server
+# 4. Start development server
 npm run dev
 
-
-
 App runs at:
+
 http://localhost:5174
 
 
@@ -66,23 +75,27 @@ http://localhost:5174
 
 🔌 API Endpoints
 
-Customers — https://685013d7e7c42cfd17974a33.mockapi.io/taxes
-Countries — https://685013d7e7c42cfd17974a33.mockapi.io/countries
+Data Type	Endpoint
+
+Customers	https://685013d7e7c42cfd17974a33.mockapi.io/taxes
+Countries	https://685013d7e7c42cfd17974a33.mockapi.io/countries
+
 
 
 ---
 
 📁 Project Structure
 
-📦 src/
-├── 📂 components/
-│   ├── 📄 DataTable.jsx
-│   ├── 🎨 DataTable.css
-│   ├── 📄 EditModal.jsx
-│   └── 🎨 EditModal.css
-├── 📄 App.jsx
-├── 🎨 App.css
-└── 🎨 index.css
+src/
+├── components/
+│   ├── DataTable.jsx
+│   ├── DataTable.css
+│   ├── EditModal.jsx
+│   └── EditModal.css
+├── App.jsx
+├── App.css
+└── index.css
+
 
 ---
 
@@ -90,34 +103,32 @@ Countries — https://685013d7e7c42cfd17974a33.mockapi.io/countries
 
 DataTable
 
-Sorting
+Sortable table
 
-Columns rendering using TanStack
+Multi-select country filter
 
-Multi-country filtering
-
-Edit modal integration
+Integrates EditModal
 
 
 EditModal
 
-Dropdown interface
+Clean dropdown design
 
-Country list editing inside modal
+Edit country names dynamically
 
-Validation and error handling
-
-Smooth interactions
+Form validation & error UI
 
 
 
 ---
 
-🏗️ Production Build
+🏗️ Build for Production
 
 npm run build
 
-Output: dist/ folder
+Output is created in:
+
+dist/
 
 
 ---
@@ -127,70 +138,59 @@ Output: dist/ folder
 Netlify
 
 npm run build
-Deploy the dist folder
+
+Deploy the dist/ folder.
 
 Vercel
 
 npm run build
-Upload dist folder to Vercel
+
+Deploy using the Vercel dashboard.
 
 GitHub Pages
 
 npm run build
-Push dist to gh-pages branch
+# Push dist contents to gh-pages branch
 
 
 ---
 
-🛠️ Development Utilities
+🛠️ Development Tools
 
-Run ESLint:
+# Lint project
 npm run lint
 
-Preview production build:
+# Preview production build
 npm run preview
 
 
 ---
 
-📸 Screenshots
-
-(Include: table UI, filters, edit modal, mobile view)
-
-
----
 
 🤝 Contributing
 
-1. Fork repo
-
-
-2. Create branch
+# 1. Fork the project
+# 2. Create a feature branch
 git checkout -b feature/amazing-feature
 
+# 3. Commit changes
+git commit -m "✨ Added amazing feature"
 
-3. Commit
-git commit -m "✨ Add amazing feature"
-
-
-4. Push
+# 4. Push to GitHub
 git push origin feature/amazing-feature
 
-
-5. Open Pull Request
-
-
+# 5. Open Pull Request
 
 
 ---
 
 📄 License
 
-This project is created solely for the Inkle Assignment.
+This project was created for the Inkle Assignment.
 
 
 ---
 
-⭐ If this project helped you, leave a star!
-Made with ❤️
+⭐ Support
 
+If you liked this project, please consider giving it a ⭐ on GitHub!
