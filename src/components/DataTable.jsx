@@ -119,13 +119,14 @@ const DataTable = () => {
   const columns = useMemo(
     () => [
       {
-        accessorKey: 'entity',
+        accessorKey: 'name',
         header: 'Entity',
         cell: (info) => (
           <span className="entity-name">
             {info.row.original.name || info.row.original.entity || info.getValue()}
           </span>
         ),
+        enableGlobalFilter: true,
       },
       {
         accessorKey: 'gender',
@@ -183,6 +184,7 @@ const DataTable = () => {
           );
         },
         enableSorting: false,
+        enableGlobalFilter: true,
       },
       {
         accessorKey: 'requestDate',
@@ -248,6 +250,7 @@ const DataTable = () => {
           });
         },
         enableSorting: false,
+        enableGlobalFilter: true,
       },
       {
         accessorKey: 'country',
@@ -296,6 +299,7 @@ const DataTable = () => {
           </div>
         ),
         enableSorting: false,
+        enableGlobalFilter: true,
       },
       {
         id: 'actions',
@@ -362,6 +366,8 @@ const DataTable = () => {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: 'includesString',
+    enableGlobalFilter: true,
   });
 
   if (loading) {

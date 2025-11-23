@@ -483,6 +483,8 @@
   border-radius: 6px;
   font-size: 14px;
   color: #374151;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
   transition: all 0.2s ease;
 }
 

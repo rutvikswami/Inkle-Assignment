@@ -39,7 +39,7 @@ const EditModal = ({ isOpen, onClose, onSave, data, countries, onCountriesUpdate
         countryId: matchingCountry ? matchingCountry.id : "",
       }));
     }
-  }, [data]); 
+  }, [data, countries]); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,6 +85,7 @@ const EditModal = ({ isOpen, onClose, onSave, data, countries, onCountriesUpdate
     setIsEditingCountry(true);
     setNewCountryName(country.name);
     setEditingCountryId(country.id);
+    setIsDropdownOpen(true); // Always open dropdown when starting edit
   };
 
   const handleCountrySave = async () => {
@@ -93,57 +94,115 @@ const EditModal = ({ isOpen, onClose, onSave, data, countries, onCountriesUpdate
       return;
     }
 
-    if (!editingCountryId) {
-      alert("No country selected for editing");
-      return;
+    // Check if editing existing country and name didn't change
+    if (editingCountryId !== "new") {
+      const originalCountry = countries.find(c => c.id === editingCountryId);
+      if (originalCountry && originalCountry.name === newCountryName.trim()) {
+        handleCountryCancel();
+        return;
+      }
     }
 
     try {
-      const response = await fetch(
-        `https://685013d7e7c42cfd17974a33.mockapi.io/countries/${editingCountryId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: newCountryName.trim(),
-          }),
-        }
+      // Check if country with new name already exists (excluding the one being edited)
+      const existingCountry = countries.find(c => 
+        c.name.toLowerCase() === newCountryName.trim().toLowerCase() && 
+        c.id !== editingCountryId
       );
-
-      if (response.ok) {
-        const updatedCountry = await response.json();
-
-        // Update the countries list
-        const updatedCountries = countries.map((country) =>
-          country.id === editingCountryId
-            ? { ...country, name: updatedCountry.name }
-            : country
+      
+      if (existingCountry) {
+        // Use existing country
+        setFormData((prev) => ({
+          ...prev,
+          country: existingCountry.name,
+          countryId: existingCountry.id,
+        }));
+        // Keep dropdown open after editing
+      } else if (editingCountryId === "new") {
+        // Creating a brand new country
+        const response = await fetch(
+          `https://685013d7e7c42cfd17974a33.mockapi.io/countries`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: newCountryName.trim(),
+            }),
+          }
         );
 
-        if (onCountriesUpdate) {
-          onCountriesUpdate(updatedCountries);
-        }
+        if (response.ok) {
+          const newCountry = await response.json();
+          const updatedCountries = [...countries, newCountry];
+          
+          if (onCountriesUpdate) {
+            onCountriesUpdate(updatedCountries);
+          }
 
-        if (formData.countryId === editingCountryId) {
+          setFormData((prev) => ({
+            ...prev,
+            country: newCountry.name,
+            countryId: newCountry.id,
+          }));
+          // Keep dropdown open after adding new country
+        } else {
+          alert("Failed to create new country");
+          return;
+        }
+      } else {
+        // Editing existing country - UPDATE the existing country in API
+        const response = await fetch(
+          `https://685013d7e7c42cfd17974a33.mockapi.io/countries/${editingCountryId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: newCountryName.trim(),
+            }),
+          }
+        );
+
+        if (response.ok) {
+          const updatedCountry = await response.json();
+          
+          // Update the countries list with the modified country
+          const updatedCountries = countries.map((country) =>
+            country.id === editingCountryId
+              ? { ...country, name: updatedCountry.name }
+              : country
+          );
+          
+          if (onCountriesUpdate) {
+            onCountriesUpdate(updatedCountries);
+          }
+
+          // Update form data with the updated country
           setFormData((prev) => ({
             ...prev,
             country: updatedCountry.name,
+            countryId: editingCountryId,
           }));
+          // Keep dropdown open after editing existing country
+        } else {
+          alert("Failed to update country");
+          return;
         }
-
-        setIsEditingCountry(false);
-        setNewCountryName("");
-        setEditingCountryId(null);
-      } else {
-        alert("Failed to update country");
       }
+
+      // Reset states
+      setIsEditingCountry(false);
+      setNewCountryName("");
+      setEditingCountryId(null);
     } catch (error) {
       console.error("Error updating country:", error);
       alert("Failed to update country");
     }
   };
+
 
   const handleCountryCancel = () => {
     setIsEditingCountry(false);
@@ -185,43 +244,17 @@ const EditModal = ({ isOpen, onClose, onSave, data, countries, onCountriesUpdate
 
           <div className="form-group">
             <label htmlFor="countryId">Country</label>
-            {isEditingCountry ? (
-              <div className="country-edit-container">
+            <div className="country-field-container" ref={dropdownRef}>
+              <div className="country-input-wrapper">
                 <input
                   type="text"
-                  value={newCountryName}
-                  onChange={(e) => setNewCountryName(e.target.value)}
-                  placeholder="Edit country name"
-                  className="country-input"
+                  value={formData.country}
+                  readOnly
+                  placeholder="Select a country"
+                  className="country-display-input"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 />
-                <div className="country-edit-actions">
-                  <button
-                    type="button"
-                    className="country-save-btn"
-                    onClick={handleCountrySave}
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    className="country-cancel-btn"
-                    onClick={handleCountryCancel}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="country-field-container" ref={dropdownRef}>
-                <div className="country-input-wrapper">
-                  <input
-                    type="text"
-                    value={formData.country}
-                    readOnly
-                    placeholder="Select a country"
-                    className="country-display-input"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  />
+                {formData.country && (
                   <button
                     type="button"
                     className="country-field-edit-btn"
@@ -232,54 +265,138 @@ const EditModal = ({ isOpen, onClose, onSave, data, countries, onCountriesUpdate
                       }
                     }}
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                       <path d="M11.333 2.667a1.333 1.333 0 011.886 0l.447.447a1.333 1.333 0 010 1.886L6 12.667l-2.667.666L4 10.667L11.333 2.667z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
-                  <button
-                    type="button"
-                    className="dropdown-arrow-btn"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  >
-                    <svg className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`} width="12" height="8" viewBox="0 0 12 8" fill="none">
-                      <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
-                </div>
-                {isDropdownOpen && (
-                  <div className="country-dropdown-list">
-                    {countries.map((country) => (
-                      <div 
-                        key={country.id} 
-                        className={`country-option ${formData.countryId === country.id ? 'selected' : ''}`}
-                        onClick={() => {
-                          setFormData(prev => ({
-                            ...prev,
-                            countryId: country.id,
-                            country: country.name
-                          }));
-                          setIsDropdownOpen(false);
-                        }}
-                      >
-                        <span className="country-name">{country.name}</span>
-                        <button
-                          type="button"
-                          className="country-edit-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCountryEditStart(country);
+                )}
+                <button
+                  type="button"
+                  className="dropdown-arrow-btn"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <svg className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`} width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              {isDropdownOpen && (
+                <div className="country-dropdown-list">
+                  {countries.map((country) => (
+                    <div key={country.id}>
+                      {isEditingCountry && editingCountryId === country.id ? (
+                        <div className="country-edit-inline">
+                          <input
+                            type="text"
+                            value={newCountryName}
+                            onChange={(e) => setNewCountryName(e.target.value)}
+                            className="country-inline-input"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleCountrySave();
+                              } else if (e.key === 'Escape') {
+                                handleCountryCancel();
+                              }
+                            }}
+                          />
+                          <div className="country-inline-actions">
+                            <button
+                              type="button"
+                              className="country-inline-save"
+                              onClick={handleCountrySave}
+                            >
+                              ✓
+                            </button>
+                            <button
+                              type="button"
+                              className="country-inline-cancel"
+                              onClick={handleCountryCancel}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div 
+                          className={`country-option ${formData.countryId === country.id ? 'selected' : ''}`}
+                          onClick={() => {
+                            if (!isEditingCountry) {
+                              setFormData(prev => ({
+                                ...prev,
+                                countryId: country.id,
+                                country: country.name
+                              }));
+                              setIsDropdownOpen(false);
+                            }
                           }}
                         >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M11.333 2.667a1.333 1.333 0 011.886 0l.447.447a1.333 1.333 0 010 1.886L6 12.667l-2.667.666L4 10.667L11.333 2.667z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </button>
+                          <span className="country-name">{country.name}</span>
+                          <button
+                            type="button"
+                            className="country-edit-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCountryEditStart(country);
+                            }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                              <path d="M11.333 2.667a1.333 1.333 0 011.886 0l.447.447a1.333 1.333 0 010 1.886L6 12.667l-2.667.666L4 10.667L11.333 2.667z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* Add new country option at the bottom */}
+                  <div className="add-new-country">
+                    <div className="country-option add-new" onClick={() => {
+                      setIsEditingCountry(true);
+                      setNewCountryName("");
+                      setEditingCountryId("new");
+                    }}>
+                      <span className="add-new-text">+ Add new country</span>
+                    </div>
+                    {isEditingCountry && editingCountryId === "new" && (
+                      <div className="country-edit-inline">
+                        <input
+                          type="text"
+                          value={newCountryName}
+                          onChange={(e) => setNewCountryName(e.target.value)}
+                          placeholder="Enter country name"
+                          className="country-inline-input"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleCountrySave();
+                            } else if (e.key === 'Escape') {
+                              handleCountryCancel();
+                            }
+                          }}
+                        />
+                        <div className="country-inline-actions">
+                          <button
+                            type="button"
+                            className="country-inline-save"
+                            onClick={handleCountrySave}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            type="button"
+                            className="country-inline-cancel"
+                            onClick={handleCountryCancel}
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="modal-actions">
